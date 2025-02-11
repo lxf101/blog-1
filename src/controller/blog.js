@@ -1,29 +1,31 @@
+const {exec} = require('../db/mysql');
+
 const getList = (author, keyword) => {
-    // return mock data
-    return [
-        {
-            id: 1,
-            title: 'title_01',
-            content: 'content_01',
-            createTime: 1739003048092,
-            author: 'lxf01'
-        },
-        {
-            id: 2,
-            title: 'title_02',
-            content: 'content_02',
-            createTime: 1739003634799,
-            author: 'eric'
-        }
-    ]
+    let sql = `select * from blogs where 1=1 `;
+    if(author){
+        sql += `and author='${author}' `
+    }
+    if(keyword){
+        sql += `and title like '%${keyword}%' `
+    }
+    sql += `order by createtime desc;`
+
+    // return a promise
+    return exec(sql);
 }
 
 // create new blog
 const newBlog = (blogData = {}) => {
-    return {
-        id: 3
-    }
+    let {content, title, author} = blogData;
+    let sql = `insert into blogs (title, content, createtime, author) values ('${title}', '${content}', '${Date.now()}', '${author}')`;
+    return exec(sql);
 }
+
+const getDetail = (id) => {
+    const sql = `select * from blogs where id='${id}'`;
+    return exec(sql)
+}
+
 
 // update a blog
 const updateBlog = (id, blogData = {}) => {
@@ -39,5 +41,6 @@ module.exports = {
     getList,
     newBlog,
     updateBlog,
-    deleteBlog
+    deleteBlog,
+    getDetail
 }

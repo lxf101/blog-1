@@ -38,13 +38,15 @@ const serverHandle = (req, res) => {
     req.path = url.split("?")[0];
     req.query = querystring.parse(url.split('?')[1]);
 
-    getPostData(req).then(res => {
-        req.body = res;
+    getPostData(req).then(resData => {
+        req.body = resData;
 
         // deal with blog route
-        let blogData = handleBlogRouter(req, res);
-        if(blogData){
-            res.end(JSON.stringify(blogData));
+        let blogResult = handleBlogRouter(req, res);
+        if(blogResult){
+            blogResult.then(blogData => {
+                res.end(JSON.stringify(blogData));
+            });
             return;
         }
 
@@ -57,7 +59,7 @@ const serverHandle = (req, res) => {
 
         // no route was matched 
         // return 404
-        res.writeHead(404, {"Content-type": "text/plain"});
+        res.writeHeader(404, {"Content-type": "text/plain"});
         res.write("404 Not Found\n");
         res.end();
     })
