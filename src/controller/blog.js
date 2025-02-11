@@ -29,12 +29,15 @@ const getDetail = (id) => {
 
 // update a blog
 const updateBlog = (id, blogData = {}) => {
-    return true;
+    let {content, title} = blogData;
+    let sql = `update blogs set content='${content}', title='${title}' where id=${id}`;
+    return exec(sql);
 }
 
 // delete a blog
-const deleteBlog = (id) => {
-    return true;
+const deleteBlog = (id, author) => {
+    let sql = `delete from blogs where id=${id} and author='${author}'`;
+    return exec(sql);
 }
 
 module.exports = {

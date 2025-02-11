@@ -35,21 +35,30 @@ const handleBlogRouter = (req, res) => {
         }
     }
 
-    if(method === 'PUT' && req.path === '/api/blog/update'){
-        let flag = updateBlog(id, req.body);
-        if(flag){
-            return new SuccessModel();
-        }else{
-            return new ErrorModel('Fail to update the blog.');
+    if(method === 'POST' && req.path === '/api/blog/update'){
+        let updateData = updateBlog(id, req.body);
+        if(updateData){
+            return updateData.then(resData => {
+                if(resData.affectedRows > 0){
+                    return new SuccessModel(true);
+                }else{
+                    return new ErrorModel('Fail to update the blog.');
+                }
+            })
         }
     }
 
-    if(method === 'DELETE' && req.path === '/api/blog/delete'){
-        let flag = deleteBlog(id);
-        if(flag){
-            return new SuccessModel();
-        }else{
-            return new ErrorModel('Fail to delete the blog.');
+    if(method === 'POST' && req.path === '/api/blog/delete'){
+        let author = 'zhangsan';
+        let delData = deleteBlog(id, author);
+        if(delData){
+            return delData.then(resData => {
+                if(resData.affectedRows > 0){
+                    return new SuccessModel(true);
+                }else{
+                    return new ErrorModel('Fail to delete the blog.');
+                }
+            })
         }
     }
 }
