@@ -1,6 +1,7 @@
 const {login} = require('../controller/user.js');
 const {SuccessModel, ErrorModel} = require('../model/resModel.js');
 
+
 const handleUserRouter = (req, res) => {
     const method = req.method;
     const {username, password} = req.body;
@@ -10,6 +11,9 @@ const handleUserRouter = (req, res) => {
         if(loginResult){
             return loginResult.then(loginData => {
                 if(loginData.username){
+                    // set session
+                    req.session.username = loginData.username;
+                    req.session.realname = loginData.realname;
                     return new SuccessModel();
                 }else{
                     return new ErrorModel('Failed login in.');

@@ -1,29 +1,39 @@
 const env = process.env.NODE_ENV;
 
-let mySqlConf;
+let MYSQL_CONFIG;
+let REDIS_CONFIG;
 
 // localhost config
 if(env === 'dev'){
-    mySqlConf = {
+    MYSQL_CONFIG = {
         host: "localhost",
         user: 'root',
         password: "123456",
         port: '3306',
         database: 'myblog'
+    }
+    REDIS_CONFIG = {
+        port: 6379,
+        host: '127.0.0.1'
     }
 }
 
 // online config
 if(env === 'production'){
-    mySqlConf = {
+    MYSQL_CONFIG = {
         host: "localhost",
         user: 'root',
         password: "123456",
         port: '3306',
         database: 'myblog'
     }
+    REDIS_CONFIG = {
+        port: 6379,
+        host: '127.0.0.1'
+    }
 }
 
 module.exports = {
-    mySqlConf
+    MYSQL_CONFIG,
+    REDIS_CONFIG
 }

@@ -5,13 +5,6 @@ const login = (username, password) => {
     return exec(sql).then(resData => {
         return resData[0] || {}
     })
-    
-    
-    
-    return true;
-
-
-
 }
 
 module.exports = {
