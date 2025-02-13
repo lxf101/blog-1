@@ -2,6 +2,8 @@ const querystring = require('querystring');
 
 const handleBlogRouter = require('./src/router/blog');
 const handleUserRouter = require('./src/router/user');
+const {setRedis, getRedis} = require('./src/db/redis');
+const {access} = require('./src/utils/log.js');
 
 // session data
 const SESSION_DATA = {};
@@ -42,6 +44,8 @@ const getPostData = (req) => {
 
 
 const serverHandle = (req, res) => {
+    // write log
+    access(`${req.method} -- ${req.url} -- ${req.headers['user-agent']} -- ${Date.now()}`);
     // set return format
     res.setHeader('Content-type', 'application/json');
     
@@ -67,15 +71,16 @@ const serverHandle = (req, res) => {
     let needSetCookie = false;
     let userId = req.cookie.userid;
     if(userId){
-        if(!SESSION_DATA[userId]){
-            SESSION_DATA[userId] = {};
+        if(!getRedis(userId)){
+            setRedis(userId, {});
         }
     }else{
         needSetCookie = true;
         userId = `${Date.now()}_${Math.random()}`;
-        SESSION_DATA[userId] = {};
+        setRedis(userId, {});
     }
-    req.session = SESSION_DATA[userId];
+    req.sessionId = userId;
+    req.session = getRedis(userId);
 
     getPostData(req).then(resData => {
         req.body = resData;
@@ -86,7 +91,7 @@ const serverHandle = (req, res) => {
             blogResult.then(blogData => {
                 if(needSetCookie){
                     // set cookie
-                    res.setHeader('Set-Cookie', `username=${userId}; path=/; httpOnly; expires=${getCookieExpires()}`);
+                    res.setHeader('Set-Cookie', `userid=${userId}; path=/; httpOnly; expires=${getCookieExpires()}`);
                 }
                 res.end(JSON.stringify(blogData));
             });
@@ -99,7 +104,7 @@ const serverHandle = (req, res) => {
             userData.then(data => {
                 if(needSetCookie){
                     // set cookie
-                    res.setHeader('Set-Cookie', `username=${userId}; path=/; httpOnly; expires=${getCookieExpires()}`);
+                    res.setHeader('Set-Cookie', `userid=${userId}; path=/; httpOnly; expires=${getCookieExpires()}`);
                 }
                 res.end(JSON.stringify(data));
             });

@@ -1,12 +1,15 @@
-const {exec} = require('../db/mysql');
+const {exec, escape} = require('../db/mysql');
 
 const getList = (author, keyword) => {
+    author = escape(author);
+    keyword = escape(keyword);
+
     let sql = `select * from blogs where 1=1 `;
     if(author){
-        sql += `and author='${author}' `
+        sql += `and author=${author} `
     }
     if(keyword){
-        sql += `and title like '%${keyword}%' `
+        sql += `and title like %${keyword}% `
     }
     sql += `order by createtime desc;`
 
@@ -17,12 +20,18 @@ const getList = (author, keyword) => {
 // create new blog
 const newBlog = (blogData = {}) => {
     let {content, title, author} = blogData;
-    let sql = `insert into blogs (title, content, createtime, author) values ('${title}', '${content}', '${Date.now()}', '${author}')`;
+    content = escape(content);
+    title = escape(title);
+    author = escape(author);
+
+    let sql = `insert into blogs (title, content, createtime, author) values (${title}, ${content}, ${Date.now()}, ${author})`;
     return exec(sql);
 }
 
 const getDetail = (id) => {
-    const sql = `select * from blogs where id='${id}'`;
+    id = escape(id);
+
+    const sql = `select * from blogs where id=${id}`;
     return exec(sql)
 }
 
@@ -30,13 +39,19 @@ const getDetail = (id) => {
 // update a blog
 const updateBlog = (id, blogData = {}) => {
     let {content, title} = blogData;
-    let sql = `update blogs set content='${content}', title='${title}' where id=${id}`;
+    content = escape(content);
+    title = escape(title);
+
+    let sql = `update blogs set content=${content}, title=${title} where id=${id}`;
     return exec(sql);
 }
 
 // delete a blog
 const deleteBlog = (id, author) => {
-    let sql = `delete from blogs where id=${id} and author='${author}'`;
+    id = escape(id);
+    author = escape(author);
+
+    let sql = `delete from blogs where id=${id} and author=${author}`;
     return exec(sql);
 }
 

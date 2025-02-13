@@ -19,7 +19,7 @@ async function setRedis(key, val){
 
 async function getRedis(key){
     try{
-        let value = await redisClient(key);
+        let value = await redisClient.get(key);
         if(value == null) return value;
         try{
             value = JSON.parse(value);

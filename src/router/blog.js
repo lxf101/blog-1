@@ -1,6 +1,16 @@
 const {getList, newBlog, updateBlog, deleteBlog, getDetail} = require('../controller/blog.js');
 const {SuccessModel, ErrorModel} = require('../model/resModel.js');
 
+// unified login authentication function
+const loginCheck = (req) => {
+    if(req.session.username){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+
 const handleBlogRouter = (req, res) => {
     const method = req.method;
     const id = req.query.id;
@@ -10,6 +20,16 @@ const handleBlogRouter = (req, res) => {
         let author = req.query.author || '';
         let keyword = req.query.keyword || '';
 
+        if(req.query.isadmin){
+            // admin page
+            let loginCheckResult = loginCheck(req);
+            if(!loginCheckResult){
+                return new ErrorModel('Not login in.'); 
+            }
+            // force to get admin blog
+            author = req.session.realname;
+        }
+        
         let result = getList(author, keyword);
         return result.then(resData => {
             return new SuccessModel(resData);
@@ -26,7 +46,12 @@ const handleBlogRouter = (req, res) => {
     }
 
     if(method === 'POST' && req.path === '/api/blog/new'){
-        req.body.author = 'zhangsan';
+        let loginCheckResult = loginCheck(req);
+        if(!loginCheckResult){
+            return new ErrorModel('Not login in.');
+        }
+
+        req.body.author = req.session.realname;
         let blogData = newBlog(req.body);
         if(blogData){
             return blogData.then(resData => {
@@ -36,6 +61,11 @@ const handleBlogRouter = (req, res) => {
     }
 
     if(method === 'POST' && req.path === '/api/blog/update'){
+        let loginCheckResult = loginCheck(req);
+        if(!loginCheckResult){
+            return new ErrorModel('Not login in.');
+        }
+
         let updateData = updateBlog(id, req.body);
         if(updateData){
             return updateData.then(resData => {
@@ -49,7 +79,11 @@ const handleBlogRouter = (req, res) => {
     }
 
     if(method === 'POST' && req.path === '/api/blog/delete'){
-        let author = 'zhangsan';
+        let loginCheckResult = loginCheck(req);
+        if(!loginCheckResult){
+            return new ErrorModel('Not login in.');
+        }
+        let author = req.session.realname;
         let delData = deleteBlog(id, author);
         if(delData){
             return delData.then(resData => {
