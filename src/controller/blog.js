@@ -3,7 +3,7 @@ const {exec, escape} = require('../db/mysql');
 
 const getList = (author, keyword) => {
     author = escape(author);
-    keyword = escape(keyword);
+    // keyword = escape(keyword);
 
     let sql = `select * from blogs where 1=1 `;
     if(author){

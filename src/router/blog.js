@@ -3,6 +3,7 @@ const {SuccessModel, ErrorModel} = require('../model/resModel.js');
 
 // unified login authentication function
 const loginCheck = (req) => {
+    console.log('=====loginCheck====req====', req.session);
     if(req.session.username){
         return true;
     }else{
@@ -21,8 +22,10 @@ const handleBlogRouter = (req, res) => {
         let keyword = req.query.keyword || '';
 
         if(req.query.isadmin){
+            console.log('==========isadmin=========');
             // admin page
             let loginCheckResult = loginCheck(req);
+            console.log('======loginCheckResult========', loginCheckResult);
             if(!loginCheckResult){
                 return new ErrorModel('Not login in.'); 
             }

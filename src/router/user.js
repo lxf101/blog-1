@@ -11,10 +11,13 @@ const handleUserRouter = (req, res) => {
         let loginResult = login(username, password);
         if(loginResult){
             return loginResult.then(loginData => {
+                console.log('outer req.session============', req.session);
                 if(loginData.username){
                     // set session
                     req.session.username = loginData.username;
                     req.session.realname = loginData.realname;
+
+                    console.log('====login=====req.session=====', req.session);
                     // synchronize redis
                     setRedis(req.sessionId, req.session);
                     return new SuccessModel();
